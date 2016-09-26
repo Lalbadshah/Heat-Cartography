@@ -1,5 +1,9 @@
 import socket
 import threading
+import asyncio
+
+UltraList=[]
+lock = threading.Lock()
 
 class ThreadedServer(object):
     def __init__(self, host, port):
@@ -10,27 +14,49 @@ class ThreadedServer(object):
         self.sock.bind((self.host, self.port))
 
     def listen(self):
+        print('Now Listening for clients')
         self.sock.listen(5)
         while True:
             client, address = self.sock.accept()
-            client.settimeout(60)
+            print('Accepting a client')
+            #client.settimeout(60)
             threading.Thread(target = self.listenToClient,args = (client,address)).start()
+            print('new Thread started')
+            print(threading.activeCount())
 
     def listenToClient(self, client, address):
+        print('Found a client')
         size = 1024
         while True:
+            print('trying to get lock')
+            yield from lock
+            print('Got lock')
             try:
                 data = client.recv(size)
+                print('Client connected')
+                data = data.decode('ascii')
                 if data:
-                    # Set the response to echo back the recieved data
-                    response = data
-                    client.send(response)
+                    datlist = data.split("")
+                    nodename = datlist[0]
+                    if("NEW" in datlist):
+                        continue
+                    else:
+                        coords = data.split("!")[1]
+                        coords = coords.split(",")
+                        x= int(coords[0])
+                        y= int(coords[1])
+                        tup=(x,y)
+                        UltraList.append(tup)
+                        print(UltraList)
+                        lock.release()
+                        continue
                 else:
                     raise error('Client disconnected')
             except:
                 client.close()
                 return False
 
+
 if __name__ == "__main__":
     port_num = input("Port? ")
-    ThreadedServer('',port_num).listen()
+    ThreadedServer('127.0.0.1',int(port_num)).listen()
