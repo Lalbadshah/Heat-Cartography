@@ -11,9 +11,14 @@ while(flag==0):
     try:
 
         # Send data
-        message = input('Enter Message to send: ')
+        message = 'Node1 !6,9'
         #print >>sys.stderr, 'sending "%s"' % message
         sock.sendall(message.encode('ascii'))
+        ans = input('Continue?')
+        if(ans=='y'):
+            flag=0
+        else:
+            flag=1
     except:
         sock.close()
         break
