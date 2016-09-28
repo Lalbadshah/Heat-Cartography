@@ -19,7 +19,9 @@ def listen(sock):
         print('Accepting a client')
         #client.settimeout(60)
         multiprocessing.Process(target = listenToClient,args = (client,address,),daemon=True).start()
-        print('new Thread started')
+        print('new Process started')
+
+
 
 
 def listenToClient(client, address):
@@ -38,7 +40,7 @@ def listenToClient(client, address):
             print(data)
             if data:
                 print('Splitting into list')
-                datlist = data.split("")
+                datlist= data.split(' ')
                 print('split the list')
                 nodename = datlist[0]
                 if("NEW" in datlist):
