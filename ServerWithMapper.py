@@ -1,6 +1,6 @@
 import socket
 import multiprocessing
-import heatmapExample
+import heatmap
 
 UltraList=[]
 lock = multiprocessing.Lock()
@@ -22,12 +22,20 @@ def listen(sock):
         multiprocessing.Process(target = listenToClient,args = (client,address,)).start()
         print('new Process started')
 
+def heatmapper():
+    global UltraList
+    print "Processing %d points..." % len(UltraList)
+    print(UltraList)
+    hm = heatmap.Heatmap()
+    img = hm.heatmap(UltraList).save("classic.png")
+    print "Processed %d points... and saved image" % len(UltraList)
 
 
 
 def listenToClient(client, address):
     print('Found a client')
     size = 1024
+    global UltraList
     count=0
     while True:
 
@@ -57,7 +65,7 @@ def listenToClient(client, address):
                     print('Got lock')
                     UltraList.append(tup)
                     if(len(UltraList)==10):
-                        heatmapExample.heatmapper(UltraList)
+                        heatmapper()
                         del UltraList[:]
                     print(UltraList)
                     lock.release()
@@ -69,7 +77,7 @@ def listenToClient(client, address):
         except:
             print('whoa! an exception!')
             client.close()
-            multiprocessing.Process.join()
+            self.join()
             break
 
 
