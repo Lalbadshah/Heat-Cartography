@@ -24,11 +24,11 @@ def listen(sock):
 
 def heatmapper():
     global UltraList
-    print "Processing %d points..." % len(UltraList)
+    print ("Processing points...")
     print(UltraList)
     hm = heatmap.Heatmap()
     img = hm.heatmap(UltraList).save("classic.png")
-    print "Processed %d points... and saved image" % len(UltraList)
+    print (UltraList)
 
 
 
@@ -77,7 +77,6 @@ def listenToClient(client, address):
         except:
             print('whoa! an exception!')
             client.close()
-            self.join()
             break
 
 

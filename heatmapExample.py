@@ -1,7 +1,8 @@
 import heatmap
 
-def heatmapper(points):
-    print "Processing %d points..." % len(points)
-    print(points)
+def heatmapper(UltraList):
+    print ("Processing points...")
+    print(UltraList)
     hm = heatmap.Heatmap()
-    img = hm.heatmap(points).save("classic.png")
+    img = hm.heatmap(UltraList).save("classic.png")
+    print (UltraList)
