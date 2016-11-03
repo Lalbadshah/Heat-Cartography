@@ -1,9 +1,8 @@
 import socket
-import multiprocessing
 import heatmapExample
 
 UltraList=[]
-lock = multiprocessing.Lock()
+mastercount=0
 
 def ThreadedServer(host,port):
     host = host
@@ -12,6 +11,7 @@ def ThreadedServer(host,port):
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host,port))
     listen(sock)
+
 def listen(sock):
     print('Now Listening for clients')
     sock.listen(5)
@@ -19,28 +19,19 @@ def listen(sock):
         client, address = sock.accept()
         print('Accepting a client')
         client.settimeout(60)
-        multiprocessing.Process(target = listenToClient,args = (client,address,)).start()
-        print('new Process started')
+        listenToClient(client,address)
 
-
-
-
-def listenToClient(client, address):
+def listenToClient(client,address):
     print('Found a client')
     size = 1024
     count=0
     while True:
 
-        try:
             data = client.recv(size)
-            print('Checking for client data')
             data = data.decode('ascii')
-            print('Client Data Decoded')
             print(data)
             if data:
-                print('Splitting into list')
                 datlist= data.split(' ')
-                print('split the list')
                 nodename = datlist[0]
                 if("NEW" in datlist):
                     print('new connection')
@@ -52,25 +43,21 @@ def listenToClient(client, address):
                     x= int(coords[0])
                     y= int(coords[1])
                     tup=(x,y)
-                    print('trying to get lock')
-                    lock.acquire()
-                    print('Got lock')
                     UltraList.append(tup)
-                    if(len(UltraList)==10):
-                        heatmapExample.heatmapper(UltraList)
+                    if(len(UltraList)>9):
+                        print("Trying to create heatmap")
+                        global mastercount
+                        mastercount+=1
+                        print("updated mastercount")
+                        heatmapExample.heatmapper(UltraList,mastercount)
+                        print("heatmapper execution comepleted")
                         del UltraList[:]
+                        print("list cleared")
                     print(UltraList)
-                    lock.release()
                     continue
             else:
-                count+=1
                 if(count==100):
                     raise ValueError('A very specific bad thing happened')
-        except:
-            print('whoa! an exception!')
-            client.close()
-            multiprocessing.Process.join()
-            break
 
 
 
